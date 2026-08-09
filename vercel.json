@@ -22,10 +22,6 @@
     {
       "src": "/docs/(.*)",
       "dest": "/api/docs.py"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
     }
   ]
 }
