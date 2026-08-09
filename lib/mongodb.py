@@ -13,7 +13,7 @@ def get_client() -> MongoClient:
         uri = os.getenv("MONGODB_URI")
         if not uri:
             raise ValueError("MONGODB_URI not set")
-        _client = MongoClient(uri)
+        _client = MongoClient(uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
     return _client
 
 
