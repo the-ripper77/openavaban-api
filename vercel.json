@@ -1,5 +1,39 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/search.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/random.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/upload.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/profiles.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/bulk.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/bulk_process.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/docs.py",
+      "use": "@vercel/python"
+    }
+  ],
   "routes": [
     {
       "src": "/",
@@ -16,6 +50,26 @@
     {
       "src": "/docs/(.*)",
       "dest": "/api/docs.py"
+    },
+    {
+      "src": "/api/search",
+      "dest": "/api/search.py"
+    },
+    {
+      "src": "/api/random",
+      "dest": "/api/random.py"
+    },
+    {
+      "src": "/api/upload",
+      "dest": "/api/upload.py"
+    },
+    {
+      "src": "/api/profiles",
+      "dest": "/api/profiles.py"
+    },
+    {
+      "src": "/api/bulk",
+      "dest": "/api/bulk_process.py"
     }
   ]
 }
