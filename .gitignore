@@ -7,3 +7,4 @@ node_modules/
 *.egg-info/
 dist/
 build/
+.commit_msg
