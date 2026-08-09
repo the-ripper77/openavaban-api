@@ -10,6 +10,7 @@ DOCS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
 PAGES = [
     {"slug": "about", "title": "About", "section": "Introduction"},
     {"slug": "quickstart", "title": "Quick Start", "section": "Introduction"},
+    {"slug": "sdk", "title": "Python SDK", "section": "Introduction"},
     {"slug": "search", "title": "Search Images", "section": "API Reference"},
     {"slug": "upload", "title": "Upload Image", "section": "API Reference"},
     {"slug": "profiles", "title": "Get / Update / Delete", "section": "API Reference"},
