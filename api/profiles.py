@@ -8,7 +8,6 @@ from bson import ObjectId
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from middleware import check_api_key
 from lib.mongodb import get_collection
 from lib.uploadthing import UploadThingClient
 from lib.models import to_response
@@ -26,11 +25,6 @@ class handler(BaseHTTPRequestHandler):
         return parse_qs(parsed.query)
 
     def do_GET(self):
-        auth_ok, auth_err = check_api_key(self)
-        if not auth_ok:
-            self._json_response(401, {"error": auth_err})
-            return
-
         params = self._get_params()
         image_id = params.get("id", [None])[0]
         user_id = params.get("user_id", [None])[0]
@@ -71,11 +65,6 @@ class handler(BaseHTTPRequestHandler):
             self._json_response(500, {"error": str(e)})
 
     def do_PUT(self):
-        auth_ok, auth_err = check_api_key(self)
-        if not auth_ok:
-            self._json_response(401, {"error": auth_err})
-            return
-
         params = self._get_params()
         image_id = params.get("id", [None])[0]
 
@@ -123,11 +112,6 @@ class handler(BaseHTTPRequestHandler):
             self._json_response(500, {"error": str(e)})
 
     def do_DELETE(self):
-        auth_ok, auth_err = check_api_key(self)
-        if not auth_ok:
-            self._json_response(401, {"error": auth_err})
-            return
-
         params = self._get_params()
         image_id = params.get("id", [None])[0]
 

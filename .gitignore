@@ -8,3 +8,5 @@ node_modules/
 dist/
 build/
 .commit_msg
+local_server.py
+test_bulk.csv

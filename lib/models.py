@@ -41,7 +41,7 @@ def create_document(
     key: str,
     file_size: int,
     mime_type: str,
-    user_id: str,
+    user_id: str = "",
     category: str = "",
     tags: list = None,
     metadata: dict = None,

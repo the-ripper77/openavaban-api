@@ -5,7 +5,6 @@ from http.server import BaseHTTPRequestHandler
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from middleware import check_api_key
 from lib.uploadthing import UploadThingClient
 from lib.mongodb import get_collection
 from lib.models import create_document, to_response
@@ -13,14 +12,6 @@ from lib.models import create_document, to_response
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        auth_ok, auth_err = check_api_key(self)
-        if not auth_ok:
-            self.send_response(401)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": auth_err}).encode())
-            return
-
         content_type = self.headers.get("Content-Type", "")
 
         if "multipart/form-data" not in content_type:
@@ -57,11 +48,11 @@ class handler(BaseHTTPRequestHandler):
         tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
         metadata = json.loads(metadata_raw) if metadata_raw else {}
 
-        if not name or not class_type or not user_id:
+        if not name or not class_type:
             self.send_response(400)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps({"error": "name, class_type, and user_id are required"}).encode())
+            self.wfile.write(json.dumps({"error": "name and class_type are required"}).encode())
             return
 
         try:

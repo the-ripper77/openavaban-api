@@ -8,6 +8,22 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/bulk",
+      "dest": "/api/bulk.py"
+    },
+    {
+      "src": "/docs",
+      "dest": "/api/docs.py"
+    },
+    {
+      "src": "/docs/(.*)",
+      "dest": "/api/docs.py"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/$1"
     }

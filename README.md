@@ -1,171 +1,79 @@
 # openavaban-api
 
-REST API for managing profile avatars and banners via UploadThing and MongoDB.
+REST API for managing profile avatars and banners with a public gallery.
 
-## Endpoints
+## Features
 
-### Upload Image
+- Image upload (avatars, banners)
+- Public home page with masonry grid
+- Full-text search with MIME type filters (JPG, PNG, GIF, WebP)
+- Random image endpoint
+- Bulk upload via CSV (up to 100 images)
+- CRUD operations
 
-```
-POST /api/upload
-```
+## Links
 
-**Headers:**
-- `X-API-Key: your-api-key`
-- `Content-Type: multipart/form-data`
+- **Home**: [openavaban-api.giripratik.com.np](https://openavaban-api.giripratik.com.np/)
+- **Docs**: [openavaban-api.giripratik.com.np/docs/about](https://openavaban-api.giripratik.com.np/docs/about)
+- **Bulk Upload**: [openavaban-api.giripratik.com.np/bulk](https://openavaban-api.giripratik.com.np/bulk)
+- **Python Library**: [pypi.org/project/openavaban](https://pypi.org/project/openavaban/)
+- **Source Code**: [github.com/the-ripper77/openavaban-api](https://github.com/the-ripper77/openavaban-api)
 
-**Form Fields:**
-| Field | Required | Description |
-|-------|----------|-------------|
-| `file` | Yes | Image file (jpg, png, gif, webp) |
-| `name` | Yes | Display name |
-| `class_type` | Yes | `avatar` or `banner` |
-| `user_id` | Yes | User identifier |
-| `category` | No | Category string |
-| `tags` | No | Comma-separated tags |
-| `metadata` | No | JSON string |
-
-**Max file size:** 10 MB
-
-**Response:** `201 Created`
-```json
-{
-    "id": "64f1a2b3...",
-    "name": "Profile Photo",
-    "class_type": "avatar",
-    "category": "profile",
-    "url": "https://utfs.io/f/...",
-    "user_id": "user_123",
-    "created_at": "2026-08-09T10:00:00+00:00",
-    "file_size": 102400,
-    "mime_type": "image/jpeg",
-    "tags": ["main"],
-    "metadata": {},
-    "dimensions": {"width": 800, "height": 600}
-}
-```
-
----
-
-### List User Images
-
-```
-GET /api/profiles?user_id=xxx&class_type=avatar&category=profile&tags=main,profile
-```
-
-**Headers:**
-- `X-API-Key: your-api-key`
-
-**Query Parameters:**
-| Param | Required | Description |
-|-------|----------|-------------|
-| `user_id` | Yes | User identifier |
-| `class_type` | No | Filter by `avatar` or `banner` |
-| `category` | No | Filter by category |
-| `tags` | No | Comma-separated tags (AND logic) |
-
-**Response:** `200 OK`
-```json
-[
-    {
-        "id": "64f1a2b3...",
-        "name": "Profile Photo",
-        "class_type": "avatar",
-        "url": "https://...",
-        ...
-    }
-]
-```
-
----
-
-### Get Single Image
-
-```
-GET /api/profiles/:id
-```
-
-**Headers:**
-- `X-API-Key: your-api-key`
-
-**Response:** `200 OK`
-```json
-{
-    "id": "64f1a2b3...",
-    "name": "Profile Photo",
-    "class_type": "avatar",
-    "url": "https://...",
-    ...
-}
-```
-
----
-
-### Update Image
-
-```
-PUT /api/profiles/:id
-```
-
-**Headers:**
-- `X-API-Key: your-api-key`
-- `Content-Type: application/json`
-
-**Body:**
-```json
-{
-    "name": "New Name",
-    "tags": ["updated", "v2"],
-    "category": "social"
-}
-```
-
-**Allowed fields:** `name`, `category`, `tags`, `metadata`, `class_type`
-
-**Response:** `200 OK`
-```json
-{
-    "id": "64f1a2b3...",
-    "name": "New Name",
-    ...
-}
-```
-
----
-
-### Delete Image
-
-```
-DELETE /api/profiles/:id
-```
-
-**Headers:**
-- `X-API-Key: your-api-key`
-
-**Response:** `200 OK`
-```json
-{
-    "success": true,
-    "deleted": "64f1a2b3..."
-}
-```
-
----
-
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `MONGODB_URI` | MongoDB connection string |
-| `UPLOADTHING_TOKEN` | UploadThing v7 token |
-| `API_KEY` | API authentication key |
-
-## Deploy to Vercel
+## Quick Start
 
 ```bash
-npm i -g vercel
-cd D:\upava-api
-vercel
+pip install openavaban
 ```
 
-Then set environment variables in Vercel dashboard.
+```python
+from openavaban import OpenavaBan
+
+client = OpenavaBan()
+
+# Upload
+result = client.upload(
+    file="photo.jpg",
+    name="Profile Photo",
+    class_type="avatar",
+    user_id="user_123"
+)
+
+# Get user's images
+images = client.get_all(user_id="user_123")
+```
+
+## API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/search?q=&class_type=&mime_type=` | No | Search images |
+| `GET` | `/api/random?category=&count=` | No | Random image(s) |
+| `POST` | `/api/upload` | Yes | Upload image |
+| `GET` | `/api/profiles?user_id=` | Yes | List user images |
+| `PUT` | `/api/profiles?id=` | Yes | Update image |
+| `DELETE` | `/api/profiles?id=` | Yes | Delete image |
+| `POST` | `/api/bulk` | Yes | Bulk upload via CSV |
+
+## Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Home — masonry grid gallery with search |
+| `/bulk` | Bulk upload — CSV upload with template |
+| `/docs/about` | Documentation |
+
+## Documentation
+
+Full API docs at [openavaban-api.giripratik.com.np/docs/about](https://openavaban-api.giripratik.com.np/docs/about)
+
+- [About](https://openavaban-api.giripratik.com.np/docs/about)
+- [Quick Start](https://openavaban-api.giripratik.com.np/docs/quickstart)
+- [Search Images](https://openavaban-api.giripratik.com.np/docs/search)
+- [Upload Image](https://openavaban-api.giripratik.com.np/docs/upload)
+- [Get / Update / Delete](https://openavaban-api.giripratik.com.np/docs/profiles)
+- [Random Image](https://openavaban-api.giripratik.com.np/docs/random)
+- [Bulk Upload](https://openavaban-api.giripratik.com.np/docs/bulk-upload)
+
+## License
+
+MIT
