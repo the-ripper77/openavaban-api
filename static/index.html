@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>openavaban-api - Image Gallery</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3a;--text:#e0e0e0;--text2:#888;--accent:#7c5cff;--accent2:#5c3ddf;--hover:#252535}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 24px}
+.header-top{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.header-bottom{max-width:1400px;margin:8px auto 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-size:20px;font-weight:700;color:var(--accent);white-space:nowrap;user-select:none;text-decoration:none}
+.logo span{color:var(--text)}
+.header-nav{display:flex;align-items:center;gap:16px;margin-left:auto;font-size:14px}
+.header-nav a{color:var(--text2);text-decoration:none;white-space:nowrap}.header-nav a:hover{color:var(--accent)}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap input{width:100%;padding:10px 16px 10px 40px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text2)}
+.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:18px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:12px;transition:all .2s}
+.filter-btn:hover{border-color:var(--accent);color:var(--text)}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mime-select{padding:6px 12px;border-radius:18px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;outline:none}
+.stats{color:var(--text2);font-size:12px;margin-left:auto;white-space:nowrap}
+.grid-container{max-width:1400px;margin:0 auto;padding:20px 24px}
+.grid{columns:5;column-gap:12px}
+@media(max-width:1200px){.grid{columns:4}}
+@media(max-width:900px){.grid{columns:3}}
+@media(max-width:600px){.grid{columns:2}.header-top{flex-wrap:wrap}.header-nav{margin-left:0}.search-wrap{min-width:100%}.header-bottom{flex-direction:column;align-items:stretch}.stats{margin-left:0;text-align:center}}
+.card{break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,92,255,.15)}
+.card img{width:100%;display:block;transition:opacity .3s}
+.card img.loading{opacity:.3}
+.card-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));opacity:0;transition:opacity .2s}
+.card:hover .card-overlay{opacity:1}
+.card-title{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+.empty{text-align:center;padding:80px 20px;color:var(--text2)}
+.empty svg{width:64px;height:64px;margin-bottom:16px;opacity:.3}
+.empty p{font-size:16px;margin-bottom:8px}
+.empty small{font-size:13px}
+.loading-spinner{display:flex;justify-content:center;padding:40px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{max-width:90vw;max-height:90vh;position:relative}
+.modal img{max-width:100%;max-height:85vh;border-radius:12px;object-fit:contain}
+.modal-close{position:fixed;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background .2s;z-index:201}
+.modal-close:hover{background:var(--accent)}
+.modal-info{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 24px;max-width:600px;width:90%;z-index:201}
+.modal-info h3{font-size:16px;margin-bottom:6px}
+.modal-info p{font-size:13px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap}
+.modal-info a{color:var(--accent);text-decoration:none}
+.modal-info a:hover{text-decoration:underline}
+.scroll-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(124,92,255,.4);z-index:50;transition:transform .2s}
+.scroll-top:hover{transform:scale(1.1)}
+.scroll-top.visible{display:flex}
+</style>
+</head>
+<body>
+<header>
+<div class="header-top">
+  <a href="/" class="logo">openavaban<span>-api</span></a>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search images..." autocomplete="off">
+  </div>
+  <div class="header-nav">
+    <a href="/docs/about">Docs</a>
+    <a href="/bulk">Bulk</a>
+    <a href="https://github.com/the-ripper77/openavaban-api" target="_blank" rel="noopener" title="GitHub">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+    </a>
+  </div>
+</div>
+<div class="header-bottom">
+  <div class="filters">
+    <button class="filter-btn active" data-type="">All</button>
+    <button class="filter-btn" data-type="avatar">Avatars</button>
+    <button class="filter-btn" data-type="banner">Banners</button>
+    <select id="mimeFilter" class="mime-select">
+      <option value="">All Types</option>
+      <option value="image">Images</option>
+      <option value="gif">GIFs</option>
+    </select>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+</header>
+
+<div class="grid-container">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    <p>No images found</p>
+    <small>Try a different search or filter</small>
+  </div>
+  <div class="loading-spinner" id="loader" style="display:none"><div class="spinner"></div></div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <button class="modal-close" id="modalClose">&times;</button>
+  <div class="modal"><img id="modalImg" src="" alt=""></div>
+  <div class="modal-info" id="modalInfo"></div>
+</div>
+
+<button class="scroll-top" id="scrollTop">&uarr;</button>
+
+<script>
+const API = '/api/search';
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const loader = document.getElementById('loader');
+const stats = document.getElementById('stats');
+const searchInput = document.getElementById('searchInput');
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modalImg');
+const modalInfo = document.getElementById('modalInfo');
+const scrollTopBtn = document.getElementById('scrollTop');
+const mimeFilter = document.getElementById('mimeFilter');
+
+let currentQuery = '';
+let currentType = '';
+let currentMime = '';
+let currentOffset = 0;
+let totalResults = 0;
+let loading = false;
+let debounceTimer;
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function createCard(item) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const img = document.createElement('img');
+  img.loading = 'lazy';
+  img.alt = item.name || '';
+  img.className = 'loading';
+  img.src = item.url;
+  img.onload = () => img.classList.remove('loading');
+  img.onerror = () => { card.style.display = 'none'; };
+
+  const overlay = document.createElement('div');
+  overlay.className = 'card-overlay';
+  overlay.innerHTML = `<div class="card-title">${escapeHtml(item.name || 'Untitled')}</div>
+    <div class="card-meta">${item.class_type || ''} ${item.tags && item.tags.length ? '&middot; ' + item.tags.slice(0,3).join(', ') : ''}</div>`;
+
+  card.appendChild(img);
+  card.appendChild(overlay);
+  card.onclick = () => openModal(item);
+  return card;
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+
+async function fetchImages(reset) {
+  if (loading) return;
+  loading = true;
+
+  if (reset) {
+    currentOffset = 0;
+    grid.innerHTML = '';
+  }
+
+  loader.style.display = 'flex';
+  empty.style.display = 'none';
+
+  const params = new URLSearchParams();
+  if (currentQuery) params.set('q', currentQuery);
+  if (currentType) params.set('class_type', currentType);
+  if (currentMime) params.set('mime_type', currentMime);
+  params.set('limit', '30');
+  params.set('offset', String(currentOffset));
+
+  try {
+    const res = await fetch(API + '?' + params.toString());
+    const data = await res.json();
+    totalResults = data.total || 0;
+    const items = data.results || [];
+
+    items.forEach(item => grid.appendChild(createCard(item)));
+
+    stats.textContent = totalResults > 0
+      ? `${totalResults} image${totalResults !== 1 ? 's' : ''}`
+      : '';
+
+    if (grid.children.length === 0) {
+      empty.style.display = 'block';
+    }
+
+    currentOffset += items.length;
+  } catch (e) {
+    stats.textContent = 'Error loading images';
+  } finally {
+    loading = false;
+    loader.style.display = 'none';
+  }
+}
+
+function openModal(item) {
+  modalImg.src = item.url;
+  modalInfo.innerHTML = `<h3>${escapeHtml(item.name || 'Untitled')}</h3>
+    <p>
+      <span>${item.class_type || ''}</span>
+      ${item.category ? '<span>' + escapeHtml(item.category) + '</span>' : ''}
+      ${item.tags && item.tags.length ? '<span>' + item.tags.map(t => escapeHtml(t)).join(', ') + '</span>' : ''}
+      <span>${formatSize(item.file_size || 0)}</span>
+      ${item.dimensions && item.dimensions.width ? '<span>' + item.dimensions.width + 'x' + item.dimensions.height + '</span>' : ''}
+      ${formatDate(item.created_at) ? '<span>' + formatDate(item.created_at) + '</span>' : ''}
+    </p>`;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentType = btn.dataset.type;
+    fetchImages(true);
+  };
+});
+
+mimeFilter.addEventListener('change', () => {
+  currentMime = mimeFilter.value;
+  fetchImages(true);
+});
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    currentQuery = searchInput.value.trim();
+    fetchImages(true);
+  }, 300);
+});
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.innerHeight + window.scrollY;
+  const docH = document.documentElement.scrollHeight;
+  if (scrollY > 400) scrollTopBtn.classList.add('visible');
+  else scrollTopBtn.classList.remove('visible');
+
+  if (scrollY >= docH - 200 && !loading && currentOffset < totalResults) {
+    fetchImages(false);
+  }
+});
+
+scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+document.getElementById('modalClose').onclick = closeModal;
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+fetchImages(true);
+</script>
+</body>
+</html>

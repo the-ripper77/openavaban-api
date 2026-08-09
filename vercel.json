@@ -1,6 +1,10 @@
 {
   "builds": [
     {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "api/search.py",
       "use": "@vercel/python"
     },
@@ -17,6 +21,10 @@
       "use": "@vercel/python"
     },
     {
+      "src": "api/bulk.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "api/bulk_process.py",
       "use": "@vercel/python"
     },
@@ -28,11 +36,11 @@
   "routes": [
     {
       "src": "/",
-      "dest": "/index.html"
+      "dest": "/api/index.py"
     },
     {
       "src": "/bulk",
-      "dest": "/bulk.html"
+      "dest": "/api/bulk.py"
     },
     {
       "src": "/docs",
