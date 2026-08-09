@@ -1,5 +1,6 @@
 import os
 import sys
+from http.server import BaseHTTPRequestHandler
 import markdown
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -144,13 +145,10 @@ def render_page(current_slug):
 </html>"""
 
 
-class handler:
-    def __init__(self, req=None, res=None):
-        pass
-
+class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        from http.server import BaseHTTPRequestHandler
-        path = self.path if hasattr(self, "path") else "/"
+        from urllib.parse import urlparse
+        path = urlparse(self.path).path
 
         slug = path.strip("/").split("/")[-1] if path.strip("/") else "about"
         slug = slug or "about"
