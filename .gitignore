@@ -7,6 +7,3 @@ node_modules/
 *.egg-info/
 dist/
 build/
-.commit_msg
-local_server.py
-test_bulk.csv
