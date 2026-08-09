@@ -1,16 +1,42 @@
 {
-  "rewrites": [
+  "builds": [
     {
-      "source": "/bulk",
-      "destination": "/bulk.html"
+      "src": "api/search.py",
+      "use": "@vercel/python"
     },
     {
-      "source": "/docs",
-      "destination": "/api/docs.py"
+      "src": "api/random.py",
+      "use": "@vercel/python"
     },
     {
-      "source": "/docs/:slug",
-      "destination": "/api/docs.py"
+      "src": "api/upload.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/profiles.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/bulk_process.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/docs.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/bulk",
+      "dest": "/bulk.html"
+    },
+    {
+      "src": "/docs",
+      "dest": "/api/docs.py"
+    },
+    {
+      "src": "/docs/(.*)",
+      "dest": "/api/docs.py"
     }
   ]
 }
