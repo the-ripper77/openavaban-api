@@ -27,6 +27,10 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
       "src": "/bulk",
       "dest": "/bulk.html"
     },
@@ -37,6 +41,26 @@
     {
       "src": "/docs/(.*)",
       "dest": "/api/docs.py"
+    },
+    {
+      "src": "/api/search",
+      "dest": "/api/search.py"
+    },
+    {
+      "src": "/api/random",
+      "dest": "/api/random.py"
+    },
+    {
+      "src": "/api/upload",
+      "dest": "/api/upload.py"
+    },
+    {
+      "src": "/api/profiles",
+      "dest": "/api/profiles.py"
+    },
+    {
+      "src": "/api/bulk",
+      "dest": "/api/bulk_process.py"
     }
   ]
 }
